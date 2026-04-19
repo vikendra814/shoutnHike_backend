@@ -13,7 +13,22 @@ const userRoutes = require('./routes/user');
 const app = express();
 
 app.use(helmet());
-app.use(cors({ origin: process.env.CLIENT_URL || '*', credentials: true }));
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://shoutn-hike-frontend.vercel.app"
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.log("Blocked by CORS:", origin);
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true
+}));
 if (process.env.NODE_ENV !== 'production') app.use(morgan('dev'));
 app.use(express.json());
 
